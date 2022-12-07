@@ -8,13 +8,13 @@ yahoo-finance-async = "*"
 pandas = "*"
 yfinance = "*"
 numpy = "*"
-sqlalchemy = "*"
+sqlalchemy = {extras = ["asyncio"], version = "*"}
 pandas-datareader = "*"
 psycopg2-binary = "*"
 yahoo-fin = "*"
 sqlalchemy-utils = "*"
 yahooquery = "*"
-databases = "*"
+databases = {extras = ["asyncpg"], version = "*"}
 tzlocal = "*"
 plotly = "*"
 pdfkit = "*"
@@ -22,6 +22,9 @@ imgkit = "*"
 asyncio = "*"
 pyfinviz = "*"
 lxml = "*"
+selenium = "*"
+asyncpg = "*"
+alembic = "*"
 
 [dev-packages]
 

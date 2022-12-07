@@ -1,5 +1,5 @@
 import traceback
-
+from pandas import DataFrame
 import pandas as pd
 from yahoo_fin import stock_info as si
 import fetch_list_of_stock_names
@@ -133,7 +133,8 @@ def fetch_ohlcv_data_for_stocks(list_of_stock_names,
             traceback.print_exc()
 
         try:
-            ohlcv_data_df=si.get_data(stock_name,start_date = "01/01/2015",)
+            ohlcv_data_df=si.get_data(stock_name,start_date = "01/01/2015")
+
             #ticker=yf.Ticker(stock_name)
             #exchange=ticker['exchange']
             #print("ticker.info.exchange=",ticker.info["exchange"])
@@ -141,7 +142,10 @@ def fetch_ohlcv_data_for_stocks(list_of_stock_names,
             # ohlcv_data_df['trading_pair'] = ohlcv_data_df["ticker"]
             ohlcv_data_df['Timestamp'] = \
                 [datetime.datetime.timestamp ( x ) for x in ohlcv_data_df.index]
-            ohlcv_data_df["open_time"]=ohlcv_data_df.index
+            ohlcv_data_df["open_time"] = ohlcv_data_df.index
+            ohlcv_data_df.index=range(0,len(ohlcv_data_df))
+            # ohlcv_data_df = populate_dataframe_with_td_indicator ( ohlcv_data_df )
+
             ohlcv_data_df["exchange"] = exchange
             ohlcv_data_df["short_name"] = short_name
             ohlcv_data_df["country"] = country
@@ -170,6 +174,54 @@ def fetch_ohlcv_data_for_stocks(list_of_stock_names,
 
     connection_to_ohlcv_for_usdt_pairs.close()
 
+def populate_dataframe_with_td_indicator(dataframe) -> DataFrame:
+    """
+    Adds several different TA indicators to the given DataFrame
+    Performance Note: For the best performance be frugal on the number of indicators
+    you are using. Let uncomment only the indicator you are using in your strategies
+    or your hyperopt configuration, otherwise you will waste your memory and CPU usage.
+    :param dataframe: Raw data from the exchange and parsed by parse_ticker_dataframe()
+    :param metadata: Additional information, like the currently traded pair
+    :return: a Dataframe with all mandatory indicators for the strategies
+    """
+
+    dataframe['exceed_high'] = False
+    dataframe['exceed_low'] = False
+
+    # count consecutive closes “lower” than the close 4 bars prior.
+    dataframe['seq_buy'] = dataframe['close'] < dataframe['close'].shift(4)
+    dataframe['seq_buy'] = dataframe['seq_buy'] * (dataframe['seq_buy'].groupby(
+        (dataframe['seq_buy'] != dataframe['seq_buy'].shift()).cumsum()).cumcount() + 1)
+
+    # count consecutive closes “higher” than the close 4 bars prior.
+    dataframe['seq_sell'] = dataframe['close'] > dataframe['close'].shift(4)
+    dataframe['seq_sell'] = dataframe['seq_sell'] * (dataframe['seq_sell'].groupby(
+        (dataframe['seq_sell'] != dataframe['seq_sell'].shift()).cumsum()).cumcount() + 1)
+
+    for index, row in dataframe.iterrows():
+        # check if the low of bars 6 and 7 in the count are exceeded by the low of bars 8 or 9.
+        seq_b = row['seq_buy']
+        if seq_b == 8:
+            dataframe.loc[index, 'exceed_low'] = (row['low'] < dataframe.loc[index - 2, 'low']) | \
+                                (row['low'] < dataframe.loc[index - 1, 'low'])
+        if seq_b > 8:
+            dataframe.loc[index, 'exceed_low'] = (row['low'] < dataframe.loc[index - 3 - (seq_b - 9), 'low']) | \
+                                (row['low'] < dataframe.loc[index - 2 - (seq_b - 9), 'low'])
+            if seq_b == 9:
+                dataframe.loc[index, 'exceed_low'] = row['exceed_low'] | dataframe.loc[index-1, 'exceed_low']
+
+        # check if the high of bars 6 and 7 in the count are exceeded by the high of bars 8 or 9.
+        seq_s = row['seq_sell']
+        if seq_s == 8:
+            dataframe.loc[index, 'exceed_high'] = (row['high'] > dataframe.loc[index - 2, 'high']) | \
+                                (row['high'] > dataframe.loc[index - 1, 'high'])
+        if seq_s > 8:
+            dataframe.loc[index, 'exceed_high'] = (row['high'] > dataframe.loc[index - 3 - (seq_s - 9), 'high']) | \
+                                (row['high'] > dataframe.loc[index - 2 - (seq_s - 9), 'high'])
+            if seq_s == 9:
+                dataframe.loc[index, 'exceed_high'] = row['exceed_high'] | dataframe.loc[index-1, 'exceed_high']
+
+    return dataframe
 
 
 if __name__=="__main__":

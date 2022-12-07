@@ -5,9 +5,14 @@ import time
 import datetime
 import drop_duplicate_mirror_levels_for_stocks
 import plot_mirror_levels_for_stocks
+import fetch_stock_names_from_finviz_with_given_filters
 
 def main_plot_mirror_levels_if_they_were_equal_to_last_high_or_low():
-    list_of_stock_names = fetch_list_of_stock_names.fetch_list_of_stock_names ()
+
+    # list_of_stock_names = fetch_list_of_stock_names.fetch_list_of_stock_names ()
+    list_of_stock_names = \
+        fetch_stock_names_from_finviz_with_given_filters. \
+            fetch_stock_info_df_from_finviz_which_satisfy_certain_options ()
     fetch_ohlcv_data_for_stocks.fetch_ohlcv_data_for_stocks ( list_of_stock_names )
 
     database_where_stock_ohlcv_data_for_daily_df_is_contained = "stocks_ohlcv_daily"

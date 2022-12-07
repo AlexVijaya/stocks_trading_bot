@@ -4,11 +4,11 @@ import traceback
 import datetime
 from pyfinviz.screener import Screener
 def fetch_stock_info_df_from_finviz_which_satisfy_certain_options():
+    print ( f"fetching stock tickers from finviz...")
     options = [Screener.IndustryOption.STOCKS_ONLY_EX_FUNDS ,
-               Screener.AverageVolumeOption.OVER_300K,Screener.CountryOption.USA,
-               Screener.OptionShortOption.SHORTABLE,
-               Screener.PriceOption.UNDER_USD50]
-    last_page = 100
+               Screener.AverageVolumeOption.OVER_300K,
+               Screener.OptionShortOption.SHORTABLE]
+    last_page = 160
     screener = Screener ( filter_options = options ,
                           view_option = Screener.ViewOption.OVERVIEW ,
                           pages = [x for x in range ( 1 , last_page+1 )] )
@@ -22,6 +22,8 @@ def fetch_stock_info_df_from_finviz_which_satisfy_certain_options():
     for number_of_df in range(1,last_page):
         stock_info_df=screener.data_frames[number_of_df]
         # soup_per_page_object=screener.soups[number_of_df]
+        # print (f"fetching stock tickers from finviz"
+        #        f" which satisfy certain options prom page {number_of_df}")
 
         try:
             # print ( stock_info_df.loc[:,"Ticker"] )

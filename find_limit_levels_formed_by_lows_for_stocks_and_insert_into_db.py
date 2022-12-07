@@ -162,11 +162,12 @@ def count_how_many_lows_lower_than_level_formed_by_lows_asset_had(engine_for_ohl
     return how_many_lows_lower_than_level_formed_by_lows_asset_had
 
 
-def find_levels_formed_by_highs_and_lows(so_many_number_of_touches_of_level_by_lows,
-                                         db_with_daily_ohlcv_stock_data,
-                                         db_where_levels_formed_by_high_or_low_will_be,
-                                         table_where_levels_formed_by_lows_will_be,
-                                         so_many_last_days_for_level_calculation = 30):
+def find_limit_levels_formed_by_lows_for_stocks(so_many_number_of_touches_of_level_by_highs,
+                                                so_many_number_of_touches_of_level_by_lows ,
+                                                db_with_daily_ohlcv_stock_data ,
+                                                db_where_levels_formed_by_high_or_low_will_be ,
+                                                table_where_levels_formed_by_lows_will_be ,
+                                                so_many_last_days_for_level_calculation = 30):
     start_time = time.time ()
     counter_for_tables = 0
 
@@ -1086,9 +1087,10 @@ if __name__=="__main__":
     table_where_levels_formed_by_lows_will_be="levels_formed_by_lows"
     so_many_number_of_touches_of_level_by_highs = 2
     so_many_number_of_touches_of_level_by_lows = 2
-    find_levels_formed_by_highs_and_lows(so_many_number_of_touches_of_level_by_lows,
-                                         db_with_daily_ohlcv_stock_data,
-                                         db_where_levels_formed_by_high_or_low_will_be,
+    find_limit_levels_formed_by_lows_for_stocks( so_many_number_of_touches_of_level_by_highs,
+                                                 so_many_number_of_touches_of_level_by_lows ,
+                                                 db_with_daily_ohlcv_stock_data ,
+                                                 db_where_levels_formed_by_high_or_low_will_be ,
 
-                                         table_where_levels_formed_by_lows_will_be,
-                                         so_many_last_days_for_level_calculation)
+                                                 table_where_levels_formed_by_lows_will_be ,
+                                                 so_many_last_days_for_level_calculation )
