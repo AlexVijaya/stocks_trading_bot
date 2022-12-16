@@ -116,10 +116,10 @@ def calculate_how_many_last_days_to_plot(data_df,first_high_unix_timestamp):
         return plot_this_many_last_days-10
 
 
-def plot_ohlcv_chart_with_levels_formed_by_rebound_off_atl (name_of_folder_where_plots_will_be,
+def plot_ohlcv_chart_with_levels_formed_by_fast_breakout_off_atl (name_of_folder_where_plots_will_be,
                                                      db_where_ohlcv_data_for_stocks_is_stored,
-                                                     db_where_levels_formed_by_rebound_off_atl_are_stored,
-                                                     table_where_levels_formed_by_rebound_off_atl_are_stored):
+                                                     db_where_levels_formed_by_fast_breakout_of_atl_are_stored,
+                                                     table_where_levels_formed_by_fast_breakout_of_atl_are_stored):
     start_time=time.time()
     current_timestamp = time.time ()
     counter=0
@@ -127,91 +127,94 @@ def plot_ohlcv_chart_with_levels_formed_by_rebound_off_atl (name_of_folder_where
     engine_for_stock_tickers_ohlcv_db , connection_to_stock_tickers_ohlcv = \
         connect_to_postres_db_without_deleting_it_first ( db_where_ohlcv_data_for_stocks_is_stored )
 
-    engine_for_db_where_levels_formed_by_rebound_off_atl_are_stored ,\
-    connection_to_db_where_levels_formed_by_rebound_off_atl_are_stored = \
-        connect_to_postres_db_without_deleting_it_first ( db_where_levels_formed_by_rebound_off_atl_are_stored )
+    engine_for_db_where_levels_formed_by_fast_breakout_of_atl_are_stored ,\
+    connection_to_db_where_levels_formed_by_fast_breakout_of_atl_are_stored = \
+        connect_to_postres_db_without_deleting_it_first ( db_where_levels_formed_by_fast_breakout_of_atl_are_stored )
 
-    table_of_levels_formed_by_rebound_off_atl_df = pd.read_sql ( f'''select * from {table_where_levels_formed_by_rebound_off_atl_are_stored} ;''' ,
-                                                 connection_to_db_where_levels_formed_by_rebound_off_atl_are_stored )
+    table_of_tickers_with_fast_breakout_of_atl_df = pd.read_sql ( f'''select * from {table_where_levels_formed_by_fast_breakout_of_atl_are_stored} ;''' ,
+                                                 connection_to_db_where_levels_formed_by_fast_breakout_of_atl_are_stored )
 
-    print ( "len(table_of_levels_formed_by_rebound_off_atl_df)" )
-    print ( len ( table_of_levels_formed_by_rebound_off_atl_df ) )
+    print ( "len(table_of_tickers_with_fast_breakout_of_atl_df)" )
+    print ( len ( table_of_tickers_with_fast_breakout_of_atl_df ) )
 
-    table_of_levels_formed_by_rebound_off_atl_df.drop_duplicates ( ignore_index = True , inplace = True )
-    print ( "len(table_of_levels_formed_by_rebound_off_atl_df)" )
-    print ( len ( table_of_levels_formed_by_rebound_off_atl_df ) )
-
-    for row_with_level_formed_by_rebound_off_atl in range ( 0 , len ( table_of_levels_formed_by_rebound_off_atl_df ) ):
-        # print("table_of_levels_formed_by_rebound_off_atl_df[[row_with_level_formed_by_rebound_off_atl]]")
+    table_of_tickers_with_fast_breakout_of_atl_df.drop_duplicates(ignore_index = True,inplace = True)
+    print("len(table_of_tickers_with_fast_breakout_of_atl_df)")
+    print ( len ( table_of_tickers_with_fast_breakout_of_atl_df ) )
+    for row_with_level_formed_by_atl_and_ready_for_fast_breakout in range ( 0 , len ( table_of_tickers_with_fast_breakout_of_atl_df ) ):
+        # print("table_of_tickers_with_fast_breakout_of_atl_df[[row_with_level_formed_by_atl_and_ready_for_fast_breakout]]")
         counter = counter + 1
 
         try:
-            print (" table_of_levels_formed_by_rebound_off_atl_df.loc[[row_with_level_formed_by_rebound_off_atl]].to_string ()" )
-            print ( table_of_levels_formed_by_rebound_off_atl_df.loc[
-                        [row_with_level_formed_by_rebound_off_atl]].to_string () )
-            one_row_df = table_of_levels_formed_by_rebound_off_atl_df.loc[[row_with_level_formed_by_rebound_off_atl]]
-            stock_ticker = table_of_levels_formed_by_rebound_off_atl_df.loc[row_with_level_formed_by_rebound_off_atl , 'ticker']
-            exchange = table_of_levels_formed_by_rebound_off_atl_df.loc[row_with_level_formed_by_rebound_off_atl , 'exchange']
-            short_name = table_of_levels_formed_by_rebound_off_atl_df.loc[row_with_level_formed_by_rebound_off_atl , 'short_name']
+            print (" table_of_tickers_with_fast_breakout_of_atl_df.loc[[row_with_level_formed_by_atl_and_ready_for_fast_breakout]].to_string ()" )
+            print ( table_of_tickers_with_fast_breakout_of_atl_df.loc[
+                        [row_with_level_formed_by_atl_and_ready_for_fast_breakout]].to_string () )
+            one_row_df = table_of_tickers_with_fast_breakout_of_atl_df.loc[[row_with_level_formed_by_atl_and_ready_for_fast_breakout]]
+            stock_ticker = table_of_tickers_with_fast_breakout_of_atl_df.loc[row_with_level_formed_by_atl_and_ready_for_fast_breakout , 'ticker']
+            exchange = table_of_tickers_with_fast_breakout_of_atl_df.loc[row_with_level_formed_by_atl_and_ready_for_fast_breakout , 'exchange']
+            short_name = table_of_tickers_with_fast_breakout_of_atl_df.loc[row_with_level_formed_by_atl_and_ready_for_fast_breakout , 'short_name']
             print ( "stock_ticker=" , stock_ticker )
             print ( "exchange=" , exchange )
-            atl = table_of_levels_formed_by_rebound_off_atl_df.loc[row_with_level_formed_by_rebound_off_atl , 'atl']
-            low_of_bsu = table_of_levels_formed_by_rebound_off_atl_df.loc[row_with_level_formed_by_rebound_off_atl , 'low_of_bsu']
-            low_of_bpu1 = table_of_levels_formed_by_rebound_off_atl_df.loc[row_with_level_formed_by_rebound_off_atl , 'low_of_bpu1']
-            low_of_bpu2 = table_of_levels_formed_by_rebound_off_atl_df.loc[row_with_level_formed_by_rebound_off_atl , 'low_of_bpu2']
+            atl = table_of_tickers_with_fast_breakout_of_atl_df.loc[row_with_level_formed_by_atl_and_ready_for_fast_breakout , 'atl']
+            low_of_bsu = table_of_tickers_with_fast_breakout_of_atl_df.loc[row_with_level_formed_by_atl_and_ready_for_fast_breakout , 'low_of_bsu']
+            # low_of_bsu = table_of_tickers_with_fast_breakout_of_atl_df.loc[
+            #     row_with_level_formed_by_atl_and_ready_for_fast_breakout , 'low_of_bsu']
 
-            close_of_bpu2 = table_of_levels_formed_by_rebound_off_atl_df.loc[
-                row_with_level_formed_by_rebound_off_atl , 'close_of_bpu2']
-            open_of_tvx = table_of_levels_formed_by_rebound_off_atl_df.loc[
-                row_with_level_formed_by_rebound_off_atl , 'open_of_tvx']
+            # low_of_pre_breakout_bar = table_of_tickers_with_fast_breakout_of_atl_df.loc[row_with_level_formed_by_atl_and_ready_for_fast_breakout , 'low_of_pre_breakout_bar']
 
-            true_low_of_bsu = table_of_levels_formed_by_rebound_off_atl_df.loc[
-                row_with_level_formed_by_rebound_off_atl , 'true_low_of_bsu']
-            true_low_of_bpu1 = table_of_levels_formed_by_rebound_off_atl_df.loc[
-                row_with_level_formed_by_rebound_off_atl , 'true_low_of_bpu1']
-            true_low_of_bpu2 = table_of_levels_formed_by_rebound_off_atl_df.loc[
-                row_with_level_formed_by_rebound_off_atl , 'true_low_of_bpu2']
+            timestamp_of_bsu = table_of_tickers_with_fast_breakout_of_atl_df.loc[row_with_level_formed_by_atl_and_ready_for_fast_breakout , 'timestamp_of_bsu']
+            timestamp_of_pre_breakout_bar =\
+                table_of_tickers_with_fast_breakout_of_atl_df.loc[
+                    row_with_level_formed_by_atl_and_ready_for_fast_breakout ,
+                    'timestamp_of_pre_breakout_bar']
 
-            volume_of_bsu = table_of_levels_formed_by_rebound_off_atl_df.loc[
-                row_with_level_formed_by_rebound_off_atl , 'volume_of_bsu']
-            volume_of_bpu1 = table_of_levels_formed_by_rebound_off_atl_df.loc[
-                row_with_level_formed_by_rebound_off_atl , 'volume_of_bpu1']
-            volume_of_bpu2 = table_of_levels_formed_by_rebound_off_atl_df.loc[
-                row_with_level_formed_by_rebound_off_atl , 'volume_of_bpu2']
 
-            timestamp_of_bsu = table_of_levels_formed_by_rebound_off_atl_df.loc[row_with_level_formed_by_rebound_off_atl , 'timestamp_of_bsu']
-            timestamp_of_bpu1 = table_of_levels_formed_by_rebound_off_atl_df.loc[row_with_level_formed_by_rebound_off_atl , 'timestamp_of_bpu1']
-            timestamp_of_bpu2 = table_of_levels_formed_by_rebound_off_atl_df.loc[row_with_level_formed_by_rebound_off_atl , 'timestamp_of_bpu2']
-            human_time_of_bsu = table_of_levels_formed_by_rebound_off_atl_df.loc[
-                row_with_level_formed_by_rebound_off_atl , 'human_time_of_bsu']
-            human_time_of_bpu1 = table_of_levels_formed_by_rebound_off_atl_df.loc[
-                row_with_level_formed_by_rebound_off_atl , 'human_time_of_bpu1']
-            human_time_of_bpu2 = table_of_levels_formed_by_rebound_off_atl_df.loc[
-                row_with_level_formed_by_rebound_off_atl , 'human_time_of_bpu2']
-            backlash = table_of_levels_formed_by_rebound_off_atl_df.loc[
-                row_with_level_formed_by_rebound_off_atl , 'backlash']
+            human_date_of_bsu = table_of_tickers_with_fast_breakout_of_atl_df.loc[
+                row_with_level_formed_by_atl_and_ready_for_fast_breakout , 'human_date_of_bsu']
+            human_date_of_pre_breakout_bar = table_of_tickers_with_fast_breakout_of_atl_df.loc[
+                row_with_level_formed_by_atl_and_ready_for_fast_breakout , 'human_date_of_pre_breakout_bar']
 
-            atr = table_of_levels_formed_by_rebound_off_atl_df.loc[
-                row_with_level_formed_by_rebound_off_atl , 'atr']
-            atr_over_this_period = table_of_levels_formed_by_rebound_off_atl_df.loc[
-                row_with_level_formed_by_rebound_off_atl , 'atr_over_this_period']
-            atr_over_this_period=int(atr_over_this_period)
+            min_volume_over_last_n_days = table_of_tickers_with_fast_breakout_of_atl_df.loc[
+                row_with_level_formed_by_atl_and_ready_for_fast_breakout , 'min_volume_over_last_n_days']
+            count_min_volume_over_this_many_days = table_of_tickers_with_fast_breakout_of_atl_df.loc[
+                row_with_level_formed_by_atl_and_ready_for_fast_breakout , 'count_min_volume_over_this_many_days']
+            count_min_volume_over_this_many_days = int ( count_min_volume_over_this_many_days )
 
-            advanced_atr = table_of_levels_formed_by_rebound_off_atl_df.loc[
-                row_with_level_formed_by_rebound_off_atl , 'advanced_atr']
-            advanced_atr_over_this_period = table_of_levels_formed_by_rebound_off_atl_df.loc[
-                row_with_level_formed_by_rebound_off_atl , 'advanced_atr_over_this_period']
+
+
+
+            # atr_over_this_period = int ( atr_over_this_period )
+
+            advanced_atr = table_of_tickers_with_fast_breakout_of_atl_df.loc[
+                row_with_level_formed_by_atl_and_ready_for_fast_breakout , 'advanced_atr']
+            advanced_atr_over_this_period = table_of_tickers_with_fast_breakout_of_atl_df.loc[
+                row_with_level_formed_by_atl_and_ready_for_fast_breakout , 'advanced_atr_over_this_period']
             advanced_atr_over_this_period = int ( advanced_atr_over_this_period )
 
-            human_time_of_bpu1_list=human_time_of_bpu1.split(" ")
-            human_time_of_bpu1=human_time_of_bpu1_list[0]
+            
+            open_of_possible_breakout_bar = table_of_tickers_with_fast_breakout_of_atl_df.loc[
+                row_with_level_formed_by_atl_and_ready_for_fast_breakout , 'open_of_possible_breakout_bar']
+
+
+            human_date_of_pre_breakout_bar_list = human_date_of_pre_breakout_bar.split ( " " )
+            human_date_of_pre_breakout_bar = human_date_of_pre_breakout_bar_list[0]
+
+            # true_low_of_bsu = table_of_tickers_with_fast_breakout_of_atl_df.loc[
+            #     row_with_level_formed_by_atl_and_ready_for_fast_breakout , 'true_low_of_bsu']
+            # true_low_of_pre_breakout_bar = table_of_tickers_with_fast_breakout_of_atl_df.loc[
+            #     row_with_level_formed_by_atl_and_ready_for_fast_breakout , 'true_low_of_pre_breakout_bar']
+
+
+            volume_of_bsu = table_of_tickers_with_fast_breakout_of_atl_df.loc[
+                row_with_level_formed_by_atl_and_ready_for_fast_breakout , 'volume_of_bsu']
+            # volume_of_pre_breakout_bar = table_of_tickers_with_fast_breakout_of_atl_df.loc[
+            #     row_with_level_formed_by_atl_and_ready_for_fast_breakout , 'volume_of_pre_breakout_bar']
 
 
 
 
 
             list_of_timestamps = []
-            list_of_unix_timestamps_for_lows = []
+            list_of_unix_timestamps_for_highs = []
             for key in one_row_df.keys ():
                 print ( "key=" , key )
                 if "timestamp" in key:
@@ -221,23 +224,24 @@ def plot_ohlcv_chart_with_levels_formed_by_rebound_off_atl (name_of_folder_where
                             timestamp_of_high = int ( timestamp_of_high )
                         if timestamp_of_high == None:
                             continue
-                        list_of_unix_timestamps_for_lows.append ( timestamp_of_high )
+                        list_of_unix_timestamps_for_highs.append ( timestamp_of_high )
                         date_object = datetime.fromtimestamp ( timestamp_of_high )
                         string_of_date_and_time = date_object.strftime ( '%Y-%m-%d %H:%M:%S' )
 
                         list_of_timestamps.append ( string_of_date_and_time )
 
             print ( "list_of_timestamps=" , list_of_timestamps )
-            print ( "list_of_unix_timestamps_for_lows=" , list_of_unix_timestamps_for_lows )
-            first_low_unix_timestamp = list_of_unix_timestamps_for_lows[0]
-            last_low_unix_timestamp=list_of_unix_timestamps_for_lows[-1]
+            print ( "list_of_unix_timestamps_for_highs=" , list_of_unix_timestamps_for_highs )
+            first_high_unix_timestamp = list_of_unix_timestamps_for_highs[0]
+            last_high_unix_timestamp = list_of_unix_timestamps_for_highs[-1]
+
 
             data_df = import_ohlcv_and_levels_formed_by_highs_for_plotting ( stock_ticker ,
                                                                             connection_to_stock_tickers_ohlcv )
             # data_df_slice_seq_buy , data_df_slice_seq_sell = \
             #     select_df_slice_with_td_sel_and_buy_with_count_more_than_1 ( data_df )
             plot_this_many_last_days_in_second_plot = \
-                calculate_how_many_last_days_to_plot ( data_df , first_low_unix_timestamp )
+                calculate_how_many_last_days_to_plot ( data_df , first_high_unix_timestamp )
             # stock_ticker_without_slash = stock_ticker.replace ( "/" , "" )
             #
             # # deleting : symbol because somehow it does not get to plot
@@ -246,8 +250,8 @@ def plot_ohlcv_chart_with_levels_formed_by_rebound_off_atl (name_of_folder_where
             #     stock_ticker = stock_ticker.replace ( ":" , '__' )
             #     print ( 'found pair with :' , stock_ticker )
 
-            print ( f'{stock_ticker} on {exchange} is number {row_with_level_formed_by_rebound_off_atl + 1} '
-                    f'out of {len ( table_of_levels_formed_by_rebound_off_atl_df )}' )
+            print ( f'{stock_ticker} on {exchange} is number {row_with_level_formed_by_atl_and_ready_for_fast_breakout + 1} '
+                    f'out of {len ( table_of_tickers_with_fast_breakout_of_atl_df )}' )
 
             last_timestamp = data_df["Timestamp"].iat[-1]
             last_date_with_time , last_date_without_time = \
@@ -314,7 +318,7 @@ def plot_ohlcv_chart_with_levels_formed_by_rebound_off_atl (name_of_folder_where
                 fig.update_layout ( height = 1500 * number_of_charts ,
                                     width = 4000 , margin = {'t': 300} ,
                                     title_text = f'{stock_ticker} '
-                                                 f'on {exchange} with rebound level at {atl} with bpu1 on {human_time_of_bpu1}. Low_of_bpu2-Level={backlash} '+'<br> '
+                                                 f'on {exchange} with level formed by atl={atl} with pre_breakout_bar on {human_date_of_pre_breakout_bar}'+'<br> '
                                                  f'"{short_name}"',
                                     font = dict (
                                         family = "Courier New, monospace" ,
@@ -349,44 +353,44 @@ def plot_ohlcv_chart_with_levels_formed_by_rebound_off_atl (name_of_folder_where
                     timestamp = datetime.strptime ( timestamp , "%Y-%m-%d %H:%M:%S" )
                     fig.add_scatter ( x = [timestamp] ,
                                       y = [low_of_bsu] , mode = "markers" ,
-                                      marker = dict ( color = 'magenta' , size = 15 ) ,
-                                      name = "bsu" , row = 1 , col = 1 )
+                                      marker = dict ( color = 'cyan' , size = 15 ) ,
+                                          name = "bsu" , row = 1 , col = 1 )
                 except Exception as e:
                     print ( "error" , e )
                     traceback.print_exc ()
 
-                # plot bpu1
-                try:
-                    timestamp = list_of_timestamps[1]
-                    timestamp = datetime.strptime ( timestamp , "%Y-%m-%d %H:%M:%S" )
-                    fig.add_scatter ( x = [timestamp] ,
-                                      y = [low_of_bpu1] , mode = "markers" ,
-                                      marker = dict ( color = 'magenta' , size = 15 ) ,
-                                      name = "bpu1" , row = 1 , col = 1 )
-                except Exception as e:
-                    print ( "error" , e )
-                    traceback.print_exc ()
+
+
+                # plot pre_breakout_bar
+                # try:
+                #     timestamp = list_of_timestamps[1]
+                #     timestamp = datetime.strptime ( timestamp , "%Y-%m-%d %H:%M:%S" )
+                #     fig.add_scatter ( x = [timestamp] ,
+                #                       y = [low_of_pre_breakout_bar] , mode = "markers" ,
+                #                       marker = dict ( color = 'cyan' , size = 15 ) ,
+                #                       name = "pre_breakout_bar" , row = 1 , col = 1 )
+                # except Exception as e:
+                #     print ( "error" , e )
+                #     traceback.print_exc ()
 
                 # plot bpu2
-                try:
-                    print("list_of_timestamps in bpu2")
-                    print ( list_of_timestamps )
-                    timestamp = list_of_timestamps[2]
-                    timestamp = datetime.strptime ( timestamp , "%Y-%m-%d %H:%M:%S" )
-                    fig.add_scatter ( x = [timestamp] ,
-                                      y = [low_of_bpu2] , mode = "markers" ,
-                                      marker = dict ( color = 'magenta' , size = 15 ) ,
-                                      name = "bpu2" , row = 1 , col = 1 )
-                except Exception as e:
-                    print ( "error" , e )
-                    traceback.print_exc ()
+                # try:
+                #     timestamp = list_of_timestamps[2]
+                #     timestamp = datetime.strptime ( timestamp , "%Y-%m-%d %H:%M:%S" )
+                #     fig.add_scatter ( x = [timestamp] ,
+                #                       y = [low_of_bpu2] , mode = "markers" ,
+                #                       marker = dict ( color = 'cyan' , size = 15 ) ,
+                #                       name = "bpu2" , row = 1 , col = 1 )
+                # except Exception as e:
+                #     print ( "error" , e )
+                #     traceback.print_exc ()
 
 
                 #plot the same on the second subplot
-                data_df_slice_drop_head = \
-                    data_df.loc[data_df["Timestamp"] >= (first_low_unix_timestamp - (86400 * 15))]
+                data_df_slice_drop_head=\
+                    data_df.loc[data_df["Timestamp"]>=(first_high_unix_timestamp-(86400*15))]
                 data_df_slice_drop_head_than_tail = \
-                    data_df_slice_drop_head.loc[(last_low_unix_timestamp + (86400 * 15)) >= data_df["Timestamp"]]
+                    data_df_slice_drop_head.loc[(last_high_unix_timestamp + (86400 * 15)) >= data_df["Timestamp"]]
 
                 try:
                     fig.add_trace ( go.Ohlc ( name = f'{stock_ticker} on {exchange}' ,
@@ -400,25 +404,70 @@ def plot_ohlcv_chart_with_levels_formed_by_rebound_off_atl (name_of_folder_where
                 except Exception as e:
                     print ( "error" , e )
                     traceback.print_exc ()
-#############################################################
 
-                min_low_in_second_plot=data_df_slice_drop_head_than_tail['low'].min()
+                ##################### plot dots
+                # plot bsu
+
+                try:
+                    timestamp = list_of_timestamps[0]
+                    timestamp = datetime.strptime ( timestamp , "%Y-%m-%d %H:%M:%S" )
+                    fig.add_scatter ( x = [timestamp] ,
+                                      y = [low_of_bsu] , mode = "markers+text" ,
+                                      marker = dict ( color = 'cyan' , size = 2 ) ,
+                                      text="bsu",
+                                        textposition = 'bottom center',
+                                      name = "bsu" , row = 2 , col = 1 )
+                except Exception as e:
+                    print ( "error" , e )
+                    traceback.print_exc ()
+
+                # plot pre_breakout bar vertical line
+                try:
+                    timestamp = list_of_timestamps[1]
+                    print ( "timestamp_of_bsu" , timestamp )
+                    timestamp = datetime.strptime ( timestamp , "%Y-%m-%d %H:%M:%S" )
+                    fig.add_vline ( x = timestamp ,line_dash="dash", line_color="black",opacity=0.5)
+                except Exception as e:
+                    print ( "error" , e )
+                    traceback.print_exc ()
+
+                # plot pre_breakout_bar
+                # try:
+                #     timestamp = list_of_timestamps[1]
+                #     timestamp = datetime.strptime ( timestamp , "%Y-%m-%d %H:%M:%S" )
+                #     fig.add_scatter ( x = [timestamp] ,
+                #                       y = [low_of_pre_breakout_bar] , mode = "markers+text" ,
+                #                       marker = dict ( color = 'cyan' , size = 2 ) ,
+                #                       text="pre_breakout_bar",
+                #                         textposition = 'top center',
+                #                       name = "pre_breakout_bar" , row = 2 , col = 1 )
+                # except Exception as e:
+                #     print ( "error" , e )
+                #     traceback.print_exc ()
+
+                
+
+                #############################################################
+
+
+
+                min_low_in_second_plot = data_df_slice_drop_head_than_tail['low'].min ()
                 max_high_in_second_plot = data_df_slice_drop_head_than_tail['high'].max ()
-                upper_border_of_atr=low_of_bsu-0.5*advanced_atr
-                lower_border_of_atr=upper_border_of_atr-advanced_atr
-                date_where_to_plot_atr_bar_unix_timestamp=\
-                    data_df_slice_drop_head_than_tail["Timestamp"].iat[1]
-                print("date_where_to_plot_atr_bar_unix_timestamp")
+
+                upper_border_of_atr = low_of_bsu - 0.5 * advanced_atr
+                lower_border_of_atr = upper_border_of_atr - advanced_atr
+                date_where_to_plot_atr_bar_unix_timestamp = data_df_slice_drop_head_than_tail["Timestamp"].iat[1]
+                print ( "date_where_to_plot_atr_bar_unix_timestamp" )
                 print ( date_where_to_plot_atr_bar_unix_timestamp )
-                date_where_to_plot_atr_bar_with_time,date_where_to_plot_atr_bar_without_time=\
-                    get_date_with_and_without_time_from_timestamp(date_where_to_plot_atr_bar_unix_timestamp)
+                date_where_to_plot_atr_bar_with_time , date_where_to_plot_atr_bar_without_time = \
+                    get_date_with_and_without_time_from_timestamp ( date_where_to_plot_atr_bar_unix_timestamp )
                 print ( "date_where_to_plot_atr_bar_without_time" )
                 print ( date_where_to_plot_atr_bar_without_time )
 
                 print ( "date_where_to_plot_atr_bar_without_time" )
                 print ( date_where_to_plot_atr_bar_without_time )
-                date_where_to_plot_atr_bar_without_time=\
-                    date_where_to_plot_atr_bar_without_time.replace("_","-")
+                date_where_to_plot_atr_bar_without_time = \
+                    date_where_to_plot_atr_bar_without_time.replace ( "_" , "-" )
 
                 try:
                     # Create scatter trace of atr (vertical line)
@@ -429,15 +478,14 @@ def plot_ohlcv_chart_with_levels_formed_by_rebound_off_atl (name_of_folder_where
                         x = [date_where_to_plot_atr_bar_without_time ,
                              date_where_to_plot_atr_bar_without_time] ,
                         y = [lower_border_of_atr , upper_border_of_atr] ,
-                        marker = dict ( color = 'magenta' , size = 30 ),
-                        line=dict ( color = 'magenta' , width = 15 ),
+                        marker = dict ( color = 'magenta' , size = 30 ) ,
+                        line = dict ( color = 'magenta' , width = 15 ) ,
 
-
-                        mode = "lines+text", row = 2 , col = 1
-                                    )
+                        mode = "lines+text" , row = 2 , col = 1
+                    )
                 except:
-                    traceback.print_exc()
-                #add annotation advanced_atr
+                    traceback.print_exc ()
+                # add annotation advanced_atr
                 try:
                     timestamp = list_of_timestamps[0]
 
@@ -446,55 +494,9 @@ def plot_ohlcv_chart_with_levels_formed_by_rebound_off_atl (name_of_folder_where
                     fig.add_scatter ( x = [date_where_to_plot_atr_bar_without_time] ,
                                       y = [lower_border_of_atr] , mode = "markers+text" ,
                                       marker = dict ( color = 'magenta' , size = 2 ) ,
-                                      text = f"advanced atr({advanced_atr_over_this_period})" ,
+                                      text = f"advanced_atr({advanced_atr_over_this_period})" ,
                                       textposition = 'bottom right' ,
                                       name = "advanced_atr" , row = 2 , col = 1 )
-                except Exception as e:
-                    print ( "error" , e )
-                    traceback.print_exc ()
-
-                try:
-                    timestamp = list_of_timestamps[0]
-
-
-                    timestamp = datetime.strptime ( timestamp , "%Y-%m-%d %H:%M:%S" )
-
-                    print ( "type_timestamp_iner" )
-                    print ( type(timestamp) )
-                    fig.add_scatter ( x = [timestamp] ,
-                                      y = [low_of_bsu] , mode = "markers+text" ,
-                                      marker = dict ( color = 'magenta' , size = 2 ) ,
-                                      text="BSU",
-                                        textposition = 'bottom center',
-                                      name = "bsu" , row = 2 , col = 1 )
-                except Exception as e:
-                    print ( "error" , e )
-                    traceback.print_exc ()
-
-                # plot bpu1
-                try:
-                    timestamp = list_of_timestamps[1]
-                    timestamp = datetime.strptime ( timestamp , "%Y-%m-%d %H:%M:%S" )
-                    fig.add_scatter ( x = [timestamp] ,
-                                      y = [low_of_bpu1] , mode = "markers+text" ,
-                                      marker = dict ( color = 'magenta' , size = 2 ) ,
-                                      text="BPU1",
-                                        textposition = 'bottom center',
-                                      name = "bpu1" , row = 2 , col = 1 )
-                except Exception as e:
-                    print ( "error" , e )
-                    traceback.print_exc ()
-
-                # plot bpu2
-                try:
-                    timestamp = list_of_timestamps[2]
-                    timestamp = datetime.strptime ( timestamp , "%Y-%m-%d %H:%M:%S" )
-                    fig.add_scatter ( x = [timestamp] ,
-                                      y = [low_of_bpu2] , mode = "markers+text" ,
-                                      text="BPU2",
-                                        textposition = 'bottom center',
-                                      marker = dict ( color = 'magenta' , size = 2 ) ,
-                                      name = "bpu2" , row = 2 , col = 1 )
                 except Exception as e:
                     print ( "error" , e )
                     traceback.print_exc ()
@@ -576,31 +578,41 @@ def plot_ohlcv_chart_with_levels_formed_by_rebound_off_atl (name_of_folder_where
                 #
                 # except:
                 #     traceback.print_exc ()
-########################################################################################
-                # #plot lines with usual atr
-                # stop_loss = atl - (atr * 0.05)
-                # calculated_backlash_from_atr = atr * 0.05
-                # buy_limit = atl + (atr * 0.5)
-                # take_profit = buy_limit + (atr * 0.5) * 3
-                #
-                # fig.add_hline ( y = atl )
-                # fig.add_hline ( y = stop_loss,row=2,col = 1,line_color="green" )
-                # fig.add_hline ( y = atl + calculated_backlash_from_atr , row = 2 , col = 1 , line_color = "black" )
-                # fig.add_hline ( y = buy_limit , row = 2 , col = 1 , line_color = "green" )
-                # fig.add_hline ( y = take_profit , row = 2 , col = 1 , line_color = "red" )
-#########################################################
 
-                # plot lines with advanced atr
-                stop_loss = atl - (advanced_atr * 0.05)
-                calculated_backlash_from_advanced_atr = advanced_atr * 0.05
-                buy_limit = atl + (advanced_atr * 0.5)
-                take_profit = buy_limit + (advanced_atr * 0.5) * 3
 
                 fig.add_hline ( y = atl )
-                fig.add_hline ( y = stop_loss , row = 2 , col = 1 , line_color = "magenta" )
-                fig.add_hline ( y = atl + calculated_backlash_from_advanced_atr ,
-                                row = 2 , col = 1 , line_color = "magenta" )
-                fig.add_hline ( y = buy_limit , row = 2 , col = 1 , line_color = "magenta" )
+
+
+                #plot all lines with usual atr
+                # stop_loss=ath + (atr * 0.05)
+                # calculated_backlash_from_atr=atr * 0.05
+                # sell_limit=ath - (atr * 0.5)
+                # take_profit = sell_limit - (atr * 0.5) * 3
+                #
+                # fig.add_hline ( y = stop_loss , row = 2 , col = 1 , line_color = "green" )
+                # fig.add_hline ( y = ath-calculated_backlash_from_atr , row = 2 , col = 1 , line_color = "black" )
+                # fig.add_hline ( y = sell_limit , row = 2 , col = 1 , line_color = "red" )
+                # fig.add_hline ( y = take_profit , row = 2 , col = 1 , line_color = "green" )
+
+                # plot all lines with advanced atr
+                stop_loss = atl + (advanced_atr * 0.05)
+                # calculated_backlash_from_advanced_atr = advanced_atr * 0.05
+                sell_stop = atl - (advanced_atr * 0.05)
+                take_profit =sell_stop- (stop_loss-sell_stop) * 3
+                open_of_possible_breakout_bar_is_away_from_atl_in_percentage=\
+                    100*((open_of_possible_breakout_bar-atl)/advanced_atr)
+
+                sell_stop=round(sell_stop,6)
+                stop_loss = round ( stop_loss , 6 )
+
+                take_profit=round(take_profit,6)
+                open_of_possible_breakout_bar_is_away_from_atl_in_percentage=\
+                    round(open_of_possible_breakout_bar_is_away_from_atl_in_percentage,6)
+
+
+                fig.add_hline ( y = stop_loss , row = 2 , col = 1 , line_color = "magenta", opacity=0.5 )
+                
+                fig.add_hline ( y = sell_stop , row = 2 , col = 1 , line_color = "magenta", opacity=0.5 )
                 fig.add_hline ( y = take_profit , row = 2 , col = 1 , line_color = "magenta" )
 
                 # fig.update_xaxes ( patch = dict ( type = 'category' ) , row = 1 , col = 1 )
@@ -611,51 +623,46 @@ def plot_ohlcv_chart_with_levels_formed_by_rebound_off_atl (name_of_folder_where
                 fig.layout.annotations[0].update ( text = '1d' , align = 'right' )
                 fig.layout.annotations[1].update ( text = '1d' , align = 'right' )
                 fig.update_annotations ( font = dict ( family = "Helvetica" , size = 60 ) )
-
-
                 try:
                     fig.add_annotation ( text =
                                          f"low_of_bsu={low_of_bsu}" 
-                                         f" | low_of_bpu1={low_of_bpu1}" 
-                                         f" | low_of_bpu2={low_of_bpu2}" + "<br>"
-                                         f" | low_of_bsu_more_decimals={true_low_of_bsu}"  
-                                         f" | low_of_bpu1_more_decimals={true_low_of_bpu1}"
-                                         f" | low_of_bpu2_more_decimals={true_low_of_bpu2}" + "<br>"
-                                         f" | close_of_bpu2={close_of_bpu2}"
-                                         f" | open_of_tvx={open_of_tvx}"
-                                         f" | volume_of_bsu={int(volume_of_bsu)}" 
-                                         f" | volume_of_bpu1={int(volume_of_bpu1)}" 
-                                         f" | volume_of_bpu2={int(volume_of_bpu2)}" + "<br>"
-                                         f" | atr({atr_over_this_period})={atr}" 
+                                         # f" | low_of_pre_breakout_bar={low_of_pre_breakout_bar}"
+                                         # f" | low_of_bpu2={low_of_bpu2}" + "<br>"
+                                         # f" | low_of_bsu_more_decimals={true_low_of_bsu}"
+                                         # f" | low_of_pre_breakout_bar_more_decimals={true_low_of_pre_breakout_bar}"
+                                         # f" | low_of_bpu2_more_decimals={true_low_of_bpu2}"+"<br>"
+                                         # f" | close_of_bpu2={close_of_bpu2}"
+                                         f" | open_of_possible_breakout_bar={open_of_possible_breakout_bar}"
+                                         f" | distance_between_atl_and_open_of_breakout_bar={open_of_possible_breakout_bar_is_away_from_atl_in_percentage} %ATR"
+                                         f" | volume_of_bsu={int(volume_of_bsu)}"+"<br>"
+                                         f" | min_volume_over_last_{count_min_volume_over_this_many_days}_days={int(min_volume_over_last_n_days)}"
+                                         # f" | volume_of_pre_breakout_bar={int(volume_of_pre_breakout_bar)}"
+                                         # f" | volume_of_bpu2={int(volume_of_bpu2)}"+"<br>"
+                                         # f" | atr({atr_over_this_period})={atr}"
                                          f" | advanced_atr({advanced_atr_over_this_period})={advanced_atr}"
-                                         f" | backlash (luft)={calculated_backlash_from_advanced_atr}" 
-                                         f" | stop_loss={stop_loss}" 
-                                         f" | buy_limit={buy_limit}" 
-                                         f" | take_profit={take_profit}"
-                                         ,
+                                         # f" | backlash (luft)={calculated_backlash_from_advanced_atr}"
+                                         f" | stop_loss={stop_loss}"
+                                         f" | sell_stop={sell_stop}"
+                                         f" | take_profit={take_profit}",
                                          xref = "x domain" , yref = "y domain" ,
                                          font = dict (
                                              family = "Courier New, monospace" ,
-                                             size = 30 ,
+                                             size = 35 ,
                                              color = "blue"
-                                         ),
-                                         borderwidth = 2 ,
-                                         borderpad = 3 ,
-                                         bordercolor='green',
-                                         bgcolor = "white" ,
+                                         )
+                                         ,bordercolor="green",
+                                        borderwidth=2,
+                                        borderpad=4,
+                                        bgcolor="white",
                                          x = 1 ,
                                          y = 1 ,
                                          row=2,col=1,
                                          showarrow = False )
                 except:
                     traceback.print_exc()
-
-
-
-
                 fig.update_layout ( showlegend = False )
                 # fig.layout.annotations[0].update ( text = f"{stock_ticker} "
-                #                                           f"on {exchange} with level formed by_high={atl}" )
+                #                                           f"on {exchange} with level formed by_high={ath}" )
                 fig.print_grid ()
 
                 fig.write_html ( where_to_plot_html )
@@ -685,26 +692,10 @@ def plot_ohlcv_chart_with_levels_formed_by_rebound_off_atl (name_of_folder_where
             traceback.print_exc ()
             pass
 
-    # delete previously plotted charts
-    # folder_to_be_deleted = os.path.join ( os.getcwd () ,
-    #                                       'datasets' ,
-    #                                       'plots' ,
-    #                                       name_of_folder_where_plots_will_be , f'{last_date_with_time}'
-    #                                        )
-    #
-    # try:
-    #     shutil.rmtree ( folder_to_be_deleted )
-    #     pass
-    # except Exception as e:
-    #     print ( "error deleting folder \n" , e )
-    #     pass
-
-
-
 
 
     connection_to_stock_tickers_ohlcv.close()
-    connection_to_db_where_levels_formed_by_rebound_off_atl_are_stored.close()
+    connection_to_db_where_levels_formed_by_fast_breakout_of_atl_are_stored.close()
     end_time = time.time ()
     overall_time = end_time - start_time
     print ( 'overall time in minutes=' , overall_time / 60.0 )
@@ -712,14 +703,14 @@ def plot_ohlcv_chart_with_levels_formed_by_rebound_off_atl (name_of_folder_where
 
 
 if __name__=="__main__":
-    name_of_folder_where_plots_will_be = 'levels_formed_by_rebound_off_atl'
+    name_of_folder_where_plots_will_be = 'fast_breakout_of_atl'
     db_where_ohlcv_data_for_stocks_is_stored="stocks_ohlcv_daily"
-    db_where_levels_formed_by_rebound_off_atl_are_stored="levels_formed_by_highs_and_lows_for_stocks"
-    table_where_levels_formed_by_rebound_off_atl_are_stored = "rebound_situations_from_atl"
+    db_where_levels_formed_by_fast_breakout_of_atl_are_stored="levels_formed_by_highs_and_lows_for_stocks"
+    table_where_levels_formed_by_fast_breakout_of_atl_are_stored = "fast_breakout_situations_of_atl"
     try:
-        plot_ohlcv_chart_with_levels_formed_by_rebound_off_atl (name_of_folder_where_plots_will_be,
+        plot_ohlcv_chart_with_levels_formed_by_fast_breakout_off_atl (name_of_folder_where_plots_will_be,
                                                      db_where_ohlcv_data_for_stocks_is_stored,
-                                                     db_where_levels_formed_by_rebound_off_atl_are_stored,
-                                                     table_where_levels_formed_by_rebound_off_atl_are_stored)
+                                                     db_where_levels_formed_by_fast_breakout_of_atl_are_stored,
+                                                     table_where_levels_formed_by_fast_breakout_of_atl_are_stored)
     except:
         traceback.print_exc()

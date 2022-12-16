@@ -133,7 +133,7 @@ def fetch_ohlcv_data_for_stocks(list_of_stock_names,
             traceback.print_exc()
 
         try:
-            ohlcv_data_df=si.get_data(stock_name,start_date = "01/01/2015")
+            ohlcv_data_df=si.get_data(stock_name,start_date = "01/01/2010")
 
             #ticker=yf.Ticker(stock_name)
             #exchange=ticker['exchange']
